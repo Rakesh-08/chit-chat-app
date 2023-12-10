@@ -1,5 +1,5 @@
-import React, { useState } from 'react'
-import { useDispatch } from "react-redux";
+import React, { useState,useEffect } from 'react'
+import { useDispatch,useSelector } from "react-redux";
 import Avatar from "../components/Avatar"
 import AddAPhotoIcon from "@mui/icons-material/AddAPhoto";
 import EditIcon from "@mui/icons-material/Edit";
@@ -18,13 +18,15 @@ const Profile = () => {
   let [showEdit, setShowEdit] = useState(false);
   let [editData, setEditData] = useState({ user: LoggedUser.name, mobile: LoggedUser.mobile });
   let [imgUpload, setImgUpload] = useState('')
-   let [themeToggle, setThemeToggle] = useState(false);
- let dispatch = useDispatch();
-    
+  
+  let themeToggle=useSelector(state=>state.ThemeReducer.themeToggle)
+ 
+  let dispatch = useDispatch();
+ 
   let handleEditForm = (e) => {
-      
-    setShowEdit(false)
+      setShowEdit(false)
   }
+
   
   return (
     <div
@@ -42,7 +44,8 @@ const Profile = () => {
                 type: "changeTheme",
                 mode: "light",
               });
-              setThemeToggle(false);
+             
+              localStorage.setItem("theme","light")
             }}
           >
             <LightModeIcon style={{ height: "15px" }} />
@@ -54,7 +57,8 @@ const Profile = () => {
                 type: "changeTheme",
                 mode: "dark",
               });
-              setThemeToggle(true);
+             
+              localStorage.setItem("theme", "dark");
             }}
           >
             {" "}

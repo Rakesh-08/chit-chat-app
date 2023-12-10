@@ -27,10 +27,6 @@ body{
     .mobView{
         display: none;
     }
-
-    .login{
-        height:70vh!important;
-    }
-
+  
 }
 

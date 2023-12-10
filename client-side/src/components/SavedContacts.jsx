@@ -2,25 +2,7 @@ import React from 'react'
 import Avatar from './Avatar';
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
-
-let contacts = [
-  { profilePic: "/dummyImg.jpg", name: "Rahul Mandal" },
-  { profilePic: "", name: "Rg ", _id: "4388" },
-  { profilePic: "/dummyImg.jpg", name: "Rahul (2nd)" },
-  { profilePic: "", name: "Rakesh" },
-  { profilePic: "/dummyImg.jpg", name: "Rahul Mandal" },
-  { profilePic: "", name: "Rahul Mandal" },
-  { profilePic: "", name: "jacky" },
-  { profilePic: "/dummyImg.jpg", name: "salman khan" },
-  { profilePic: "/dummyImg.jpg", name: "Rahul Mandal" },
-  { profilePic: "", name: "Rg ", _id: "4388" },
-  { profilePic: "/dummyImg.jpg", name: "Rahul (2nd)" },
-  { profilePic: "", name: "Rakesh" },
-  { profilePic: "/dummyImg.jpg", name: "Rahul Mandal" },
-  { profilePic: "", name: "Rahul Mandal" },
-  { profilePic: "", name: "jacky" },
-  { profilePic: "/dummyImg.jpg", name: "salman khan" },
-];
+import { contacts } from '../utils';
 
 const SavedContacts = () => {
   let dispatch = useDispatch();
@@ -30,6 +12,7 @@ const SavedContacts = () => {
     <div className="my-3">
       {contacts.map((contact, i) => (
         <div
+          style={{cursor:"pointer"}}
           onClick={() => {
             dispatch({
               type: "changeChatRoom",
@@ -41,9 +24,9 @@ const SavedContacts = () => {
             }
           } }
           key={i}
-          className="d-flex align-items-center m-2"
+          className="d-flex align-items-center m-2 my-3"
         >
-          <Avatar img={contact.profilePic} dim={50} />
+          <Avatar img={contact.profilePic} dim={40} />
           <p className="mx-4">{contact.name}</p>
         </div>
       ))}

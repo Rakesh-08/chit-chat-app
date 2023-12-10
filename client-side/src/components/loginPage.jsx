@@ -42,7 +42,7 @@ const LoginPage = () => {
   return (
     <div style={{height:"100vh"}}  className="bg-dark login d-flex align-items-center ">
       <div className="d-flex flex-wrap justify-content-around w-100">
-        <div>
+        <div >
           <img
           
             width="35%"
@@ -51,7 +51,7 @@ const LoginPage = () => {
           />
           <span className="mx-3 text-white display-5">Chit-Chat</span>
         </div>
-        <div className="p-4 m-2 border rounded-4">
+        <div className="p-4 m-2 mt-5 border rounded-4">
           <form onSubmit={handleSubmit}>
             <div className="form-floating mb-1">
               <input
@@ -142,7 +142,8 @@ let VerificationModal = ({showVerify,setShowVerify,email,mobile}) => {
     if (res == localStorage.getItem("otp")) {
 
       loginCall({ email, mobile }).then((res) => {
-        console.log(res.data)
+        console.log(res.data);
+        localStorage.removeItem("userStatus")
         localStorage.setItem("LoggedUser",JSON.stringify(res.data))
          NavigateTo("/Home")
       }).catch((err) => {

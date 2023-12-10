@@ -10,12 +10,7 @@ function App() {
 
   return (
     <BrowserRouter>
-      <div>
-          <div style={{ height: "10rem", width: '10rem', background: "skyBlue", borderRadius: "50%", filter: "blur(5em)", position: "absolute", bottom: "5em", left: "7em",zIndex:-1}}>
-  </div>
-      <div style={{ height: "10rem", width: '10rem', background: "skyBlue", borderRadius: "50%", filter: "blur(5em)", position: "absolute", top: "5em", right: "7em",zIndex:-1 }}></div>
-      </div>
-    
+  
       <Routes>
         <Route path="/" element={<LoginPage />}></Route>
         <Route path="/Home" element={<HomePage />}></Route>

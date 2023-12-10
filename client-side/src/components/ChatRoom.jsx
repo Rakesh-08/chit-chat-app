@@ -60,7 +60,7 @@ const ChatRoom = ({ connect }) => {
       }}
     >
       {/* header part */}
-      <div style={{ background: "lightGreen" }} className="p-2 shadow-lg">
+      <div style={{ background: "lightGreen",position:"sticky",top:0 }} className="p-2 shadow-lg">
         <div className="d-flex align-items-center ">
           <KeyboardBackspaceIcon onClick={()=>NavigateTo("/Home")} className=" mx-1 fs-6 text-secondary"/>
           <Avatar img={connect.profilePic} dim={40} />
@@ -97,7 +97,7 @@ const ChatRoom = ({ connect }) => {
                     chat.id == "other" ? "rgb(128, 128, 216)" : "violet",
                   borderRadius: "0em 1em 1em",
                 }}
-                className=" p-3"
+                className="p-2"
               >
                 {chat.msg}
               </div>

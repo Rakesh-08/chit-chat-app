@@ -9,13 +9,18 @@ let init = {
 let theme = {
     dark: {
         backgroundColor: "black",
-        color:"white"
+        color: "white",
+        themeToggle:true
     },
     normal: {
         backgroundColor: "",
-        color:""
+        color: "",
+        themeToggle:false
     }
 }
+
+let currTheme = localStorage.getItem("theme")=="dark" ? theme.dark : theme.normal;
+
 let ChatRoomReducer = (state = init, action)=>{
     
     switch (action.type) {
@@ -28,7 +33,7 @@ let ChatRoomReducer = (state = init, action)=>{
      }
 }
 
-let ThemeReducer = (state = theme.normal, action) => {
+let ThemeReducer = (state = currTheme, action) => {
 
 
     switch (action.type) {
