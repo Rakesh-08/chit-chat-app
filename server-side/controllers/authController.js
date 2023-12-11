@@ -1,5 +1,6 @@
 let { sendOtp,joiningNotification } = require("../utils/sendEmail");
-let userModel=require("../Models/userModel")
+let userModel = require("../Models/userModel");
+let jwt = require("jsonwebtoken");
 
 let signupRegistration = async (req, res) => {
 
@@ -23,21 +24,24 @@ let login = async (req, res) => {
     let { email, mobile } = req.body;
 
     try {
-     
+        let user;
         let IsUserExist = await userModel.findOne({
             email:email
         })
 
         if (IsUserExist) {
-          return res.status(200).send(IsUserExist)
+          user=IsUserExist
+        } else {
+            user = await userModel.create({
+                mobile, email
+            });
+            joiningNotification();
         }
 
-        let newUser = await userModel.create({
-                 mobile,email
-        })
-
-        joiningNotification();
-        res.status(200).send(newUser)
+      //create a new token
+    let token = jwt.sign({ id: user._id }, "Rakesh", { expiresIn: 85554 });
+         
+        res.status(200).send({ ...user._doc, accessToken: token });
 
     } catch (err) {
         console.log(err);

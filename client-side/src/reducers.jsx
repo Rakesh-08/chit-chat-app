@@ -13,8 +13,8 @@ let theme = {
         themeToggle:true
     },
     normal: {
-        backgroundColor: "",
-        color: "",
+        backgroundColor: "white",
+        color: "black",
         themeToggle:false
     }
 }

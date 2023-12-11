@@ -34,6 +34,7 @@ expressApp.use(cors());
 
 //import the routes
 require("./Routes/authRoutes")(expressApp);
+require("./Routes/UserRoutes")(expressApp);
 
 expressApp.listen(process.env.PORT, () => {
     console.log("server listening on port " + process.env.PORT)

@@ -1,29 +1,51 @@
-import React,{useState} from 'react'
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from "react-router-dom"
 import SearchBar from './SearchBar';
 import User from './User';
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import SavedContacts from './SavedContacts';
 import Profile from './Profile';
 import AddContactModal from './AddContactModal';
-import { useSelector, useDispatch } from "react-redux"
-import { dummyUsers } from '../utils';
+import { useSelector, useDispatch } from "react-redux";
+import { dummyUsers  } from '../utils';
+ import { contacts as dummyContacts } from '../utils';
+import { getContactCall } from '../apiCalls/userApi';
 
 
 const HomeLeftPart = () => {
   let [routes, setRoutes] = useState("chats");
   let [addContact, setAddContact] = useState(false);
-  let [showActions,setShowActions] = useState(false)
+  let [showActions, setShowActions] = useState(false)
+  let [Users, setUsers] = useState([]);
+  let [contacts,setContacts] = useState([]);
   let state = useSelector(state => state.ThemeReducer);
- 
 
+  let NavigateTo=useNavigate()
+ 
+  useEffect(() => {
+    if (JSON.parse(localStorage.getItem("LoggedUser"))) {
+      fetchContacts();
+    } else {
+      setUsers(dummyUsers);
+      setContacts(dummyContacts)
+    }
+  }, [])
+
+  let fetchContacts = () => {
+   
+    getContactCall().then((res) => {
+         setContacts(res.data)
+    }).catch((err) => {console.log(err)});
+  }
+  
   let deleteAccountFn = () => {
     
   }
+
   return (
     <div
       style={{
         zIndex: 88,
-        overflowY: "auto",
         minWidth: "25em",
         width: "36vw",
         background: state.backgroundColor,
@@ -45,43 +67,46 @@ const HomeLeftPart = () => {
       <div className="d-flex position-relative justify-content-end mt-2">
         <MoreVertIcon
           onClick={() => {
-            setShowActions(!showActions)
+            setShowActions(!showActions);
           }}
         />
 
-      {showActions&& <div
-          style={{
-            position: "absolute",
-            top: "1.2em",
-            right: "1em",
-            borderRadius: "0.9em 0em 0.5em 0.9em",
-            zIndex:1000
-          }}
-          className="bg-white text-dark p-3"
-        >
-          <p
-            onClick={() => {localStorage.clear() }}
-            className="pointer"
-           >
-            Logout
-          </p>
-          
-            <p onClick={deleteAccountFn} className="text-danger border-bottom border-2 border-danger pointer">
-              Delete Account
+        {showActions && (
+          <div
+            style={{
+              position: "absolute",
+              top: "1.2em",
+              right: "1em",
+              borderRadius: "0.9em 0em 0.5em 0.9em",
+              border: "1px solid  gray",
+              zIndex: 1000,
+            }}
+            className="bg-white text-dark p-1 px-2"
+          >
+            <p
+              onClick={() => {
+                let conf = window.confirm("Are you sure you want to logout?")
+                if (conf) {
+                  localStorage.clear();
+                  NavigateTo("/")
+                }
+               
+              }}
+              className="pointer text-danger border-bottom border-2 border-danger"
+            >
+              Logout
             </p>
-          
-        </div>}  
+
+          </div>
+        )}
       </div>
 
       <div
         style={{
-          position: "sticky",
-          top: "0em",
-          zIndex: 889,
           backgroundColor: state.backgroundColor,
           color: state.color,
         }}
-        className="d-flex flex-wrap justify-content-around my-2 border-bottom border-2 "
+        className="d-flex flex-wrap justify-content-around  border-bottom border-2 "
       >
         <div
           onClick={() => setRoutes("chats")}
@@ -102,6 +127,7 @@ const HomeLeftPart = () => {
         >
           Contacts
         </div>
+
         <div
           onClick={() => setRoutes("profile")}
           className={`p-1 pointer  ${
@@ -111,6 +137,7 @@ const HomeLeftPart = () => {
         >
           Profile
         </div>
+
         <div>
           <button
             onClick={() => setAddContact(true)}
@@ -124,24 +151,55 @@ const HomeLeftPart = () => {
         </div>
       </div>
 
-      {routes == "contacts" && (
-        <div className="p-2">
-          <SearchBar />
-          <SavedContacts />
-        </div>
-      )}
+      <div style={{ overflowY: "auto", height: "78%" }} className="p-2 ">
+        {routes == "chats" && (
+          <>
+            {Users.length > 0 ? (
+              <>
+                {Users?.map((user, i) => {
+                  return <User key={i} user={user} />;
+                })}
+              </>
+            ) : (
+              <div className="h-100 d-flex align-items-center justify-content-center p-2">
+                <p className="w-75 fst-italic text-primary ">
+                  You have not started any conversation with anyone,Try to share
+                  your feeling ,thoughts or anything you want with others.
+                </p>
+              </div>
+            )}
+          </>
+        )}
 
-      {routes == "chats" && (
-        <div className="p-2">
-          {dummyUsers.map((user, i) => {
-            return <User key={i} user={user} />;
-          })}
-        </div>
-      )}
+        {routes == "contacts" && (
+          <>
+            <SearchBar />
+            {contacts.length > 0 ? (
+              <SavedContacts contacts={contacts} />
+            ) : (
+              <div className="h-100 d-flex align-items-center justify-content-center p-2">
+                <p className="w-75 fst-italic text-secondary ">
+                 Your contact list is empty . Connect to your friends and families and save their details here.
+                </p>
+              </div>
+            )}
+          </>
+        )}
 
-      {routes == "profile" && <Profile />}
+        {routes == "profile" && <Profile />}
+      </div>
+      <div
+        style={{
+          textAlign: "center",
+          fontSize: "13px",
+          fontWeight: "bold",
+          color: "gray",
+        }}
+      >
+        copyrights 2023 @Rakesh_Mandal
+      </div>
 
-      <AddContactModal addContact={addContact} setAddContact={setAddContact} />
+      <AddContactModal refetchFn={fetchContacts} addContact={addContact} setAddContact={setAddContact} />
     </div>
   );
 }

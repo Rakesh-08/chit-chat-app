@@ -8,12 +8,11 @@ let sendEmailApi = `${baseUrl}/notificationService/api/v1/sendEmail`;
 
 module.exports.joiningNotification = () => {
 
-    console.log("joining notification")
-
     let emails = "mandal8285980523@gmail.com";
     let subject = "Sign up notification ";
     let content =
      `Hey admin,
+     
       A new user is signed up with your  ${process.env.APP} application. please have a look over the guy and try to communicate with him.
 
 

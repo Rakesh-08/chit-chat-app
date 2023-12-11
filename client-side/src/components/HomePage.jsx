@@ -10,9 +10,9 @@ const HomePage = () => {
   let NavigatTo = useNavigate();
 
   useEffect(() => {
-    // if (!localStorage.getItem("chatToken")) {
-    //     NavigatTo("/")
-    // }
+    if (!(localStorage.getItem("userStatus")||localStorage.getItem("LoggedUser"))) {
+        NavigatTo("/")
+    }
   },[])
   return (
     <div className="home">

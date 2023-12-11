@@ -142,9 +142,10 @@ let VerificationModal = ({showVerify,setShowVerify,email,mobile}) => {
     if (res == localStorage.getItem("otp")) {
 
       loginCall({ email, mobile }).then((res) => {
-        console.log(res.data);
+      
         localStorage.removeItem("userStatus")
-        localStorage.setItem("LoggedUser",JSON.stringify(res.data))
+        localStorage.setItem("LoggedUser", JSON.stringify(res.data))
+        localStorage.setItem("chatToken",res.data.accessToken)
          NavigateTo("/Home")
       }).catch((err) => {
         console.log(err);

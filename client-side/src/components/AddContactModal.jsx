@@ -1,21 +1,38 @@
-import React,{useState} from 'react';
+import React,{useState,useEffect} from 'react';
 import { Modal } from "react-bootstrap"
+import { addContactCall } from '../apiCalls/userApi';
 
-const AddContactModal = ({ addContact, setAddContact }) => {
+const AddContactModal = ({ addContact, setAddContact,refetchFn }) => {
     let [newContact, setNewContact] = useState({ mobile: "", user: "" });
-    let [showMsg,setShowMsg]=useState({msg:"",color:""})
+  let [showMsg, setShowMsg] = useState({ msg: "", color: "" });
+
+  useEffect(() => {
+    setNewContact({ mobile: "", user: "" });
+    setShowMsg({ msg: "", color: "" });
+  },[])
 
     let SaveContactFn = (e) => {
         e.preventDefault();
 
-   if (newContact.mobile.length != 10) {
+      if (newContact.mobile.length != 10) {
        return setShowMsg({ msg: "Invalid Mobile Number", color: "danger" });
-        }
-        
-     setShowMsg({ msg: "contact saved", color: "success" });
+      }
 
-        console.log(newContact)
-        setAddContact(false)
+      let temp = {
+        mobile: newContact.mobile,
+        saveAs:newContact.user
+      }
+      
+      addContactCall(temp).then(res => {
+        console.log(res);
+        refetchFn();
+        setShowMsg({ msg: " Yay! Contact Saved !!", color: "success" });
+      
+      }).catch(err => {
+        console.log(err);
+        setShowMsg({ msg:err.response.data.message , color: "danger" });
+      })
+              
 }
     return (
       <Modal

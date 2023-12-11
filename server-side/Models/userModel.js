@@ -10,15 +10,22 @@ let userSchema = new mongoose.Schema({
     },
     mobile: {
         type: Number,
-        required:true
+        required: true,
+        unique: true,
     },
     username: {
         type: String,
-        default:"User"
+        default: "User"
     },
     profilePic: {
-        type:String
-    }
+        type: String,
+        default: ""
+    },
+    savedContacts: [{
+        id: mongoose.SchemaTypes.ObjectId,
+        userImg: String,
+        savedAs: String
+    }]
 
 }, {
     timestamps: true,

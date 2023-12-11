@@ -5,32 +5,58 @@ import AddAPhotoIcon from "@mui/icons-material/AddAPhoto";
 import EditIcon from "@mui/icons-material/Edit";
 import ModeNightIcon from "@mui/icons-material/ModeNight";
 import LightModeIcon from "@mui/icons-material/LightMode";
+import { updateUserCall, uploadImg } from '../apiCalls/userApi';
 
-let LoggedUser = {
+let dummyUser = {
   profilePic: "",
   email: "abc@example.com",
   mobile: "9388383998",
-  name: "User",
+  username: "User",
   
 }
 
 const Profile = () => {
   let [showEdit, setShowEdit] = useState(false);
-  let [editData, setEditData] = useState({ user: LoggedUser.name, mobile: LoggedUser.mobile });
-  let [imgUpload, setImgUpload] = useState('')
+  let [loggedUser, setLoggedUser] = useState({})
+  let [editData, setEditData] = useState({});
   
   let themeToggle=useSelector(state=>state.ThemeReducer.themeToggle)
  
   let dispatch = useDispatch();
+
+  useEffect(() => {
+    let user = JSON.parse(localStorage.getItem("LoggedUser"));
+        if (user) {
+          setLoggedUser(user);
+          setEditData({user:user.username,mobile:user.mobile})
+        } else {
+          setLoggedUser(dummyUser);
+          setEditData({ user: user.username, mobile: user.mobile });
+       }
+  },[])
  
   let handleEditForm = (e) => {
+    e.preventDefault();
+    let temp = {
+      username:editData.user
+    }
+    
+    updateUserCall(temp).then(res => {
+     
+      localStorage.setItem("LoggedUser", JSON.stringify(res.data));
+      setLoggedUser(res.data);
       setShowEdit(false)
+    }).catch(err => {
+      console.log(err)
+      alert(err.response.data?.message)
+    });
+      
   }
 
   
   return (
     <div
-      style={{ minHeight: "55%" }}
+      style={{ minHeight: "65%" }}
       className="d-flex text-center p-2  flex-column align-items-center justify-content-center position-relative"
     >
       <div style={{ position: "absolute", top: 0, right: 0 }}>
@@ -66,13 +92,23 @@ const Profile = () => {
           </span>
         </button>
       </div>
-      <div className="position-relative   ">
-        <Avatar img={LoggedUser.profilePic} dim={100} />
-        <p>{LoggedUser.name || "User"}</p>
+      <div style={{width:"10em",position:"relative"}}>
+        <Avatar img={loggedUser.profilePic} dim={100} />
+        <p className="mt-1">{loggedUser.username } </p>
         <input
           onChange={(e) => {
             if (e.target.files && e.target.files[0]) {
-              setImgUpload(e.target.files[0]);
+              let Data = new FormData();
+              Data.append("profile", e.target.files[0]);
+
+              uploadImg(Data).then((res) => {
+                localStorage.setItem("LoggedUser", JSON.stringify(res.data));
+                setLoggedUser(res.data)
+              }).catch(err => {
+                console.log(err);
+                alert(err.response.data?.message)
+              })
+              
               e.target.value = "";
             }
           }}
@@ -86,8 +122,9 @@ const Profile = () => {
             style={{
               position: "absolute",
               top: "45%",
-              right: "10px",
+              right: "22%",
               zIndex: 999,
+              color:"darkBlue"
             }}
           />
         </label>
@@ -95,19 +132,19 @@ const Profile = () => {
 
       <div className=" d-flex  w-100 justify-content-end">
         <span data-toggle="tooltip" title="edit profile" className="mx-3">
-          <EditIcon onClick={() => setShowEdit(true)} />
+          <EditIcon onClick={() => setShowEdit(!showEdit)} />
         </span>
       </div>
       <div>
-        <h4>M: {LoggedUser.mobile}</h4>
-        <p style={{ color: "purple" }}>{LoggedUser.email}</p>
+        <h4>M: {loggedUser.mobile}</h4>
+        <p style={{ color: "purple" }}>{loggedUser.email}</p>
       </div>
       {showEdit && (
         <div>
-          <p className="fst-italic my-3 lead">Update Profile</p>
+          <p className="fst-italic my-3 lead">Update Username</p>
           <form
             onSubmit={handleEditForm}
-            className="bg-info rounded shadow-lg m-3 p-2"
+            className="bg-warning rounded shadow-lg m-3 p-2"
           >
             <input
               value={editData.user}
@@ -118,17 +155,8 @@ const Profile = () => {
               placeholder="Username"
             />
 
-            <input
-              value={editData.mobile}
-              onChange={(e) =>
-                setEditData({ ...editData, mobile: e.target.value })
-              }
-              className="form-control m-1"
-              placeholder="Mobile No."
-            />
-
             <div className="mt-3">
-              <button className="btn btn-warning text-white">confirm</button>
+              <button type="submit" className="btn btn-info ">confirm</button>
             </div>
           </form>
         </div>

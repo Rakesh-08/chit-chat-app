@@ -28,11 +28,18 @@ let msgs = [
 const ChatRoom = ({ connect }) => {
   let latestMsgRef = useRef();
   let [text, setText] = useState("");
+  let [chatMsgs, setChatMsgs] = useState([]);
   let state = useSelector(state => state.ThemeReducer);
   let NavigateTo = useNavigate();
 
+
   useEffect(() => {
     scrollToLatestMsg();
+    if (localStorage.getItem("chatToken")) {
+  
+    } else {
+      setChatMsgs(msgs)
+    }
   }, [connect._id])
   
   let scrollToLatestMsg = () => {
@@ -56,17 +63,22 @@ const ChatRoom = ({ connect }) => {
         backgroundSize: "cover",
         height: "99vh",
         position: "relative",
-        
       }}
     >
       {/* header part */}
-      <div style={{ background: "lightGreen",position:"sticky",top:0 }} className="p-2 shadow-lg">
+      <div
+        style={{ background: "lightGreen", position: "sticky", top: 0 }}
+        className="p-2 shadow-lg"
+      >
         <div className="d-flex align-items-center ">
-          <KeyboardBackspaceIcon onClick={()=>NavigateTo("/Home")} className=" mx-1 fs-6 text-secondary"/>
-          <Avatar img={connect.profilePic} dim={40} />
+          <KeyboardBackspaceIcon
+            onClick={() => NavigateTo("/Home")}
+            className=" mx-1 fs-6 text-secondary"
+          />
+          <Avatar img={connect.userImg} dim={40} />
           <div className="mx-2">
             <div className="">
-              <span> {connect.name || connect.mobile}</span>
+              <span> {connect.savedAs || connect.mobile}</span>
               <h6 style={{ fontSize: "13px", fontWeight: "bold" }}>
                 online || offline active 4h ago
               </h6>
@@ -77,38 +89,74 @@ const ChatRoom = ({ connect }) => {
 
       {/* // chat container */}
 
-      <div style={{ overflowY: "scroll", height: "83%",  backgroundColor: state.backgroundColor, color: state.color }}>
-        {msgs.map((chat, i) => (
-          <div
-            style={{
-              display: "flex",
-              justifyContent: chat.id == "other" ? "start" : "end",
-            }}
-            className="m-3"
-            key={i}
-          >
-            <div style={{ maxWidth: "70%" }}>
-              {/* <h6  >{chat.id ==
-                "other" ? connect.name||connect.mobile : "You"}</h6> */}
-
+      <div
+        style={{
+          overflowY: "scroll",
+          height: "83%",
+          backgroundColor: state.backgroundColor,
+          color: state.color,
+        }}
+      >
+        {chatMsgs.length > 0 ? (
+          <>
+            {chatMsgs.map((chat, i) => (
               <div
                 style={{
-                  background:
-                    chat.id == "other" ? "rgb(128, 128, 216)" : "violet",
-                  borderRadius: "0em 1em 1em",
+                  display: "flex",
+                  justifyContent: chat.id == "other" ? "start" : "end",
                 }}
-                className="p-2"
+                className="m-3"
+                key={i}
               >
-                {chat.msg}
+                <div style={{ maxWidth: "70%" }}>
+                  {/* <h6  >{chat.id ==
+                "other" ? connect.name||connect.mobile : "You"}</h6> */}
+
+                  <div
+                    style={{
+                      background:
+                        chat.id == "other" ? "rgb(128, 128, 216)" : "violet",
+                      borderRadius: "0em 1em 1em",
+                      position: "relative",
+                    }}
+                    className="p-2 "
+                  >
+                    <span cl>{chat.msg}</span>
+
+                    <div
+                      style={{
+                        fontSize: "10px",
+                        display: "flex",
+                        justifyContent: "end",
+                        color: "rgb(38,48,93)",
+                      }}
+                    >
+                      <span>
+                        {new Date().getHours() >= 12
+                          ? `${
+                              new Date().getHours() - 12
+                            }: ${new Date().getMinutes()} pm`
+                          : `${new Date().getHours()}:${new Date().getMinutes()} am`}
+                      </span>
+                    </div>
+                  </div>
+                </div>
               </div>
-            </div>
+            ))}
+          </>
+        ) : (
+          <div className="h-100 d-flex align-items-center justify-content-center p-2">
+            <p className=" fst-italic text-secondary ">
+                Start Your conversation  with smile
+            </p>
           </div>
-        ))}
+        )}
+
         <span ref={latestMsgRef}></span>
       </div>
 
       {/* type input msg */}
-      <div className="d-flex align-items-center bg-white p-2  w-100 position-sticky bottom-0">
+      <div className="d-flex  align-items-center bg-white p-2  w-100 position-sticky bottom-0">
         <button className="btn bg-white shadow-lg">+</button>
         <InputEmoji
           value={text}
