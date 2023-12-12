@@ -1,10 +1,11 @@
-import {combineReducers} from "redux" 
+import { combineReducers } from "redux";
     
 let init = {
     connect: {
         id: "welcome"
     }
-}
+};
+
 
 let theme = {
     dark: {
@@ -18,6 +19,7 @@ let theme = {
         themeToggle:false
     }
 }
+  
 
 let currTheme = localStorage.getItem("theme")=="dark" ? theme.dark : theme.normal;
 
@@ -28,10 +30,13 @@ let ChatRoomReducer = (state = init, action)=>{
         case "changeChatRoom":
             let temp = action.payload;
             return ({ ...state, connect: temp });
+        case "reset":
+            return init;
         default:
             return state
      }
 }
+
 
 let ThemeReducer = (state = currTheme, action) => {
 
@@ -50,7 +55,7 @@ let ThemeReducer = (state = currTheme, action) => {
 
 let rootReducer = combineReducers({
     ChatRoomReducer,
-    ThemeReducer
+    ThemeReducer,
 })
 
 export default rootReducer

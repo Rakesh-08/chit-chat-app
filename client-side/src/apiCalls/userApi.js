@@ -16,4 +16,8 @@ let uploadImg = async (data) => {
     return await axiosInstance.put("/chat-app/profilePicture/upload", data);
 }
 
-export { addContactCall,getContactCall,updateUserCall,uploadImg }
+let getUser = async (id) => {
+    return await axiosInstance.get("/chat-app/user/"+id)
+}
+
+export { addContactCall,getContactCall,updateUserCall,uploadImg,getUser }

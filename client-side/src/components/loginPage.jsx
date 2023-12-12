@@ -1,7 +1,8 @@
-import React,{useState} from "react";
+import React,{useState,useEffect} from "react";
 import { Modal } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import { loginCall, registerToPlatform } from "../apiCalls/authApi";
+import bcrypt from "bcryptjs";
 
 
 let emptyOTP = {
@@ -15,18 +16,20 @@ let emptyOTP = {
 const LoginPage = () => {
     let [showVerify, setShowVerify] = useState(false);
     let [credentials, setCredentials] = useState({ email: "", mobile: "" })
-    let [msg, setMsg] = useState("");
+  let [msg, setMsg] = useState("");
+  let NavigateTo = useNavigate();
+
+  useEffect(() => {
+    if (localStorage.getItem("chatToken")) {
+                NavigateTo("/Home")
+              }
+  },[])
 
     let handleSubmit = (e) => {
       e.preventDefault();
       
       if (credentials.mobile.length!=10) {
         return setMsg("Invalid Mobile Number")
-      }
-
-      if (credentials.mobile == "8888888888") {
-        setShowVerify(true)
-        return;
       }
 
       registerToPlatform({ email: credentials.email })
@@ -125,13 +128,7 @@ let VerificationModal = ({showVerify,setShowVerify,email,mobile}) => {
       res += otp[i];
     }
 
-    // let guest user see the application with dummy data;
-    if (res == "88888") {
-      localStorage.setItem("userStatus", "guest");
-      NavigateTo("/Home");
-      return;
-     }
-
+  
     let thresholdTime = Date.now(JSON.parse(localStorage.getItem("time")));
     let currTime = Date.now();
 
@@ -139,7 +136,7 @@ let VerificationModal = ({showVerify,setShowVerify,email,mobile}) => {
       return alert("SORRY! OTP IS EXPIRED ,TRY AGAIN")
     }
     
-    if (res == localStorage.getItem("otp")) {
+    if (bcrypt.compareSync(res,localStorage.getItem("otp"))) {
 
       loginCall({ email, mobile }).then((res) => {
       

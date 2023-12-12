@@ -1,6 +1,7 @@
 let { sendOtp,joiningNotification } = require("../utils/sendEmail");
 let userModel = require("../Models/userModel");
 let jwt = require("jsonwebtoken");
+let bcrypt= require('bcryptjs')
 
 let signupRegistration = async (req, res) => {
 
@@ -10,7 +11,9 @@ let signupRegistration = async (req, res) => {
         let otp = Math.floor(Math.random() * 90000) + 10000;
         sendOtp(email, otp);
 
-        res.status(200).send({otp:otp,time:new Date()})
+        let hashedOtp = await bcrypt.hashSync(otp.toString(), 8);
+
+        res.status(200).send({otp:hashedOtp,time:new Date()})
         
     } catch (err) {
         console.log(err);

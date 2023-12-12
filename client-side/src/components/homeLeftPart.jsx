@@ -6,29 +6,30 @@ import MoreVertIcon from "@mui/icons-material/MoreVert";
 import SavedContacts from './SavedContacts';
 import Profile from './Profile';
 import AddContactModal from './AddContactModal';
-import { useSelector, useDispatch } from "react-redux";
-import { dummyUsers  } from '../utils';
- import { contacts as dummyContacts } from '../utils';
+import { useSelector,useDispatch } from "react-redux";
 import { getContactCall } from '../apiCalls/userApi';
+import { getAllChatRooms } from '../apiCalls/chatApi';
+
 
 
 const HomeLeftPart = () => {
   let [routes, setRoutes] = useState("chats");
   let [addContact, setAddContact] = useState(false);
   let [showActions, setShowActions] = useState(false)
-  let [Users, setUsers] = useState([]);
-  let [contacts,setContacts] = useState([]);
+  let [chatRooms, setChatRooms] = useState([]);
+  let [contacts, setContacts] = useState([]);
+  let [messages, setMessaages] = useState([]);
   let state = useSelector(state => state.ThemeReducer);
-
-  let NavigateTo=useNavigate()
+  let NavigateTo = useNavigate();
+  let dispatch = useDispatch();
+  
+  let loggedUser = JSON.parse(localStorage.getItem("LoggedUser"));
  
   useEffect(() => {
-    if (JSON.parse(localStorage.getItem("LoggedUser"))) {
+    if (loggedUser) {
       fetchContacts();
-    } else {
-      setUsers(dummyUsers);
-      setContacts(dummyContacts)
-    }
+      setupChats();
+    } 
   }, [])
 
   let fetchContacts = () => {
@@ -38,9 +39,14 @@ const HomeLeftPart = () => {
     }).catch((err) => {console.log(err)});
   }
   
-  let deleteAccountFn = () => {
-    
-  }
+  
+  let setupChats = () => {
+   
+    getAllChatRooms().then(res => {
+      setChatRooms(res.data)
+    })
+    .catch(err=>{console.log(err)})
+ }
 
   return (
     <div
@@ -85,18 +91,19 @@ const HomeLeftPart = () => {
           >
             <p
               onClick={() => {
-                let conf = window.confirm("Are you sure you want to logout?")
+                let conf = window.confirm("Are you sure you want to logout?");
                 if (conf) {
                   localStorage.clear();
-                  NavigateTo("/")
+                  dispatch({
+                    type: "reset",
+                  });
+                  NavigateTo("/");
                 }
-               
               }}
               className="pointer text-danger border-bottom border-2 border-danger"
             >
               Logout
             </p>
-
           </div>
         )}
       </div>
@@ -154,10 +161,21 @@ const HomeLeftPart = () => {
       <div style={{ overflowY: "auto", height: "78%" }} className="p-2 ">
         {routes == "chats" && (
           <>
-            {Users.length > 0 ? (
+            {chatRooms.length > 0 ? (
               <>
-                {Users?.map((user, i) => {
-                  return <User key={i} user={user} />;
+                {chatRooms?.map((chatRoom, i) => {
+                  let [senderId] = chatRoom.members.filter(
+                    (id) => id !== loggedUser?._id
+                  );
+              let sender = contacts.find((con) => con.id == senderId);
+                  return (
+                    <User
+                      key={i}
+                      chatRoomId={chatRoom._id}
+                      user={sender}
+                      senderId={senderId}
+                    />
+                  );
                 })}
               </>
             ) : (
@@ -175,11 +193,15 @@ const HomeLeftPart = () => {
           <>
             <SearchBar />
             {contacts.length > 0 ? (
-              <SavedContacts contacts={contacts} />
+              <SavedContacts
+                contacts={contacts}
+                chatRooms={chatRooms}
+              />
             ) : (
               <div className="h-100 d-flex align-items-center justify-content-center p-2">
                 <p className="w-75 fst-italic text-secondary ">
-                 Your contact list is empty . Connect to your friends and families and save their details here.
+                  Your contact list is empty . Connect to your friends and
+                  families and save their details here.
                 </p>
               </div>
             )}
@@ -199,7 +221,11 @@ const HomeLeftPart = () => {
         copyrights 2023 @Rakesh_Mandal
       </div>
 
-      <AddContactModal refetchFn={fetchContacts} addContact={addContact} setAddContact={setAddContact} />
+      <AddContactModal
+        refetchFn={fetchContacts}
+        addContact={addContact}
+        setAddContact={setAddContact}
+      />
     </div>
   );
 }

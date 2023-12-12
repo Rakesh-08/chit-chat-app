@@ -1,3 +1,4 @@
+
 let userModel = require("../Models/userModel");
 let fs = require("fs");
 
@@ -98,8 +99,6 @@ let updateUser = async (req, res) => {
     }
 }
 
-
-
 let uploadProfileImage = async (req, res) => {
     try {
         let url = `${process.env.BASE_URL}/${req.file.filename}`;
@@ -142,10 +141,30 @@ let uploadProfileImage = async (req, res) => {
     }
 };
 
+let getUserById = async (req, res) => {
+    try {
+        let user = await userModel.findOne({
+            _id:req.params.userId
+        })
+        
+        if (!user) {
+            return res.status(404).send({
+                message: 'User not found'
+            })
+        }
+
+        res.status(200).send(user)
+    } catch (err) {
+        console.log(err);
+        res.status(500).json(err);
+    }
+}
+
 
 module.exports = {
     addNewContact,
     getAllContact,
     updateUser,
-    uploadProfileImage
+    uploadProfileImage,
+    getUserById
 }

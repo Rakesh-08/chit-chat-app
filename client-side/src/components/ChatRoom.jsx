@@ -3,58 +3,86 @@ import InputEmoji from "react-input-emoji";
 import Avatar from "../components/Avatar"
 import SendIcon from "@mui/icons-material/Send";
 import KeyboardBackspaceIcon from "@mui/icons-material/KeyboardBackspace";
-import { useSelector } from "react-redux";
-import { useNavigate } from "react-router-dom"
+import { useSelector,useDispatch } from "react-redux";
+import { useNavigate } from "react-router-dom";
+// import { io } from "socket.io-client";
+import { sendMessage,fetchMessagesForChatRoom } from '../apiCalls/chatApi';
 
-let msgs = [
-  { id: "other", msg: "some random message" },
-  { id: "other", msg: "some random message" },
-  { id: "you", msg: "some dummy message from my side as well" },
-  { id: "other", msg: "I got your dummy message thank you" },
-  { id: "you", msg: "okk buddy , take care of yourself and your family" },
-  { id: "other", msg: "some random message" },
-  { id: "other", msg: "some random message" },
-  { id: "you", msg: "some dummy message from my side as well" },
-  { id: "other", msg: "I got your dummy message thank you" },
-  { id: "you", msg: "okk buddy , take care of yourself and your family" },
-  { id: "other", msg: "some random message" },
-  { id: "other", msg: "some random message" },
-  { id: "you", msg: "some dummy message from my side as well" },
-  { id: "other", msg: "I got your dummy message thank you" },
-  { id: "you", msg: "okk buddy , take care of yourself and your family" },
-  { id: "you", msg: "hello world how are your" },
-];
-
-const ChatRoom = ({ connect }) => {
-  let latestMsgRef = useRef();
+const ChatRoom = () => {
+  let [latestMsgRef, setLatestMsgRef] = useState(null);
+  // let socket = useRef();
   let [text, setText] = useState("");
   let [chatMsgs, setChatMsgs] = useState([]);
+  let [onlineUsers,setOnlineUsers]=useState([]);
   let state = useSelector(state => state.ThemeReducer);
+  let connect = useSelector((state) => state.ChatRoomReducer.connect);
   let NavigateTo = useNavigate();
 
 
+let loggedUser= JSON.parse(localStorage.getItem("LoggedUser"));
+
+  useEffect(() => {
+
+    if (localStorage.getItem("chatToken")) {
+           socketCalls   
+    }
+  }, [connect.id])
+  
   useEffect(() => {
     scrollToLatestMsg();
     if (localStorage.getItem("chatToken")) {
-  
+         fetchMessages(connect.chatRoomId)
     } else {
       setChatMsgs(msgs)
     }
-  }, [connect._id])
+  }, [connect.id,latestMsgRef])
+  
+  let socketCalls = () => {
+
+    // socket.current = io("http://localhost:5050");
+    // socket.current.emit("new-user", connect._id);
+    // socket.current.on("get-users", (users) => {
+    //   setOnlineUsers(users);
+    //   console.log(users);
+    // });
+  };
+
+ let fetchMessages = (id) => {
+   fetchMessagesForChatRoom(id)
+     .then((res) => {
+       setChatMsgs(res.data);
+     })
+     .catch((err) => {
+       console.log(err);
+     });
+ };
   
   let scrollToLatestMsg = () => {
-     if (latestMsgRef?.current) {
-       latestMsgRef.current.scrollIntoView({ behavior: "smooth" });
+
+     if (latestMsgRef) {
+       latestMsgRef.scrollIntoView({ behavior: "smooth" });
      }
   }
-  
+
   let handleOnEnter = () => {
     if (text == "") {
       return 
     }
+
+    let temp = {
+      senderId: JSON.parse(localStorage.getItem("LoggedUser"))?._id,
+      receiver:[connect.id],
+      msg:text
+    }
+  
+    sendMessage(temp).then(res => {
+          fetchMessages(connect.chatRoomId)
+    }).catch(err=>console.log(err));
     
     scrollToLatestMsg();
   }
+
+
 
   return (
     <div
@@ -78,7 +106,7 @@ const ChatRoom = ({ connect }) => {
           <Avatar img={connect.userImg} dim={40} />
           <div className="mx-2">
             <div className="">
-              <span> {connect.savedAs || connect.mobile}</span>
+              <span> {connect.savedAs || connect.mobile||connect.unknown}</span>
               <h6 style={{ fontSize: "13px", fontWeight: "bold" }}>
                 online || offline active 4h ago
               </h6>
@@ -103,7 +131,7 @@ const ChatRoom = ({ connect }) => {
               <div
                 style={{
                   display: "flex",
-                  justifyContent: chat.id == "other" ? "start" : "end",
+                  justifyContent: chat.id == loggedUser?._id ? "end" : "start",
                 }}
                 className="m-3"
                 key={i}
@@ -115,7 +143,7 @@ const ChatRoom = ({ connect }) => {
                   <div
                     style={{
                       background:
-                        chat.id == "other" ? "rgb(128, 128, 216)" : "violet",
+                        chat.id == loggedUser?._id ? "rgb(128, 128, 216)" : "violet",
                       borderRadius: "0em 1em 1em",
                       position: "relative",
                     }}
@@ -132,27 +160,26 @@ const ChatRoom = ({ connect }) => {
                       }}
                     >
                       <span>
-                        {new Date().getHours() >= 12
+                        {new Date(chat.createdAt).getHours() >= 12
                           ? `${
-                              new Date().getHours() - 12
-                            }: ${new Date().getMinutes()} pm`
-                          : `${new Date().getHours()}:${new Date().getMinutes()} am`}
+                              new Date(chat.createdAt).getHours() - 12
+                            }:${new Date(chat.createdAt).getMinutes()} pm`
+                          : `${new Date(chat.createdAt).getHours()}:${new Date(chat.createdAt).getMinutes()} am`}
                       </span>
                     </div>
                   </div>
                 </div>
               </div>
             ))}
+            <span ref={ref=>setLatestMsgRef(ref)}></span>
           </>
         ) : (
           <div className="h-100 d-flex align-items-center justify-content-center p-2">
             <p className=" fst-italic text-secondary ">
-                Start Your conversation  with smile
+              Start Your conversation with smile
             </p>
           </div>
         )}
-
-        <span ref={latestMsgRef}></span>
       </div>
 
       {/* type input msg */}

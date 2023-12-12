@@ -1,0 +1,21 @@
+{
+  "name": "web-socket",
+  "version": "1.0.0",
+  "description": "web socket for real time chat application",
+  "main": "index.js",
+  "scripts": {
+    "start":"nodemon index.js"
+  },
+  "keywords": [
+    "socket.io",
+    "websockets",
+    "emit",
+    "on"
+  ],
+  "author": "Rakesh Kumar Mandal",
+  "license": "ISC",
+  "dependencies": {
+    "nodemon": "^3.0.2",
+    "socket.io": "^4.7.2"
+  }
+}

@@ -31,7 +31,7 @@ const Profile = () => {
           setEditData({user:user.username,mobile:user.mobile})
         } else {
           setLoggedUser(dummyUser);
-          setEditData({ user: user.username, mobile: user.mobile });
+          setEditData({ user: dummyUser.username, mobile: dummyUser.mobile });
        }
   },[])
  
