@@ -14,7 +14,6 @@ const ChatRoom = () => {
   let socket = useRef();
   let [sendText, setSendText] = useState(null);
   let [receiveMessage, setReceiveMessage] = useState(null);
-  let [disconnectTime, setDisconnectTime] = useState("");
   let [text, setText] = useState("");
   let [chatMsgs, setChatMsgs] = useState([]);
   let [onlineUsers, setOnlineUsers] = useState([]);
@@ -37,16 +36,14 @@ const ChatRoom = () => {
     socket.current.on("get-users", (users) => {
       setOnlineUsers(users);
     });
-    socket.current.on("disconnet-time", (data) => {
-      setDisconnectTime(data.disconnectedAt)
-    })
+
   }, [onlineUsers])
   
   // send message to socket server
   useEffect(() => {
     if (sendText !== null) {
       socket.current.emit("send-message", sendText);
-      console.log(sendText)
+      
     }
   }, [sendText])
  
@@ -55,11 +52,9 @@ const ChatRoom = () => {
 
     socket.current.on("receive-message", (data) => {
       setReceiveMessage(data)
-    });
-    console.log("first")
+    })
     
     if (receiveMessage !== null) {
-      console.log("second")
       setChatMsgs([...chatMsgs, receiveMessage])
     }
   }, [receiveMessage])
@@ -155,7 +150,7 @@ const ChatRoom = () => {
                   (user) => user.userId == (connect.id || connect._id)
                 )
                   ? "online"
-                  : `last seen ${format(disconnectTime)}`}
+                  : `offline`}
               </h6>
             </div>
           </div>

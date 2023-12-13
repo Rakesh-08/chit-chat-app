@@ -7,7 +7,7 @@ let io = require("socket.io")( 5050,{
 let activeUsers=[]
 
 io.on("connection", (socket) => {
-    console.log(activeUsers)
+   
        // add new user
     socket.on("new-user", (userId) => {
              
@@ -37,7 +37,7 @@ io.on("connection", (socket) => {
     socket.on("disconnect", () => {
         activeUsers = activeUsers.filter(user => user.socketId !== socket.id);
         io.emit("get-users", activeUsers);
-        io.emit("disconnet-time", { disconnectedAt: Date.now() });
+        
     })
 
 })
