@@ -124,11 +124,15 @@ let uploadProfileImage = async (req, res) => {
             "savedContacts.id": req._id
         });
 
+        console.log("before",updateImageToOthersContact);
+
         updateImageToOthersContact.map(async(user) => {
           let cont=user.savedContacts.find(contact => contact.id==req._id);
             cont.userImg = url;
             await user.save()
         })
+
+        console.log(updateImageToOthersContact)
        
         user.profilePic = url;
         await user.save();
