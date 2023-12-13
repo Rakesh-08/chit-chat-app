@@ -10,7 +10,7 @@ const HomeRightPart = () => {
      
 
   return (
-    <div className="h-100 "> 
+    <div className="h-100"> 
       {state.id == "welcome" ? <Welcome /> :
         <ChatRoom />}    
       </div>

@@ -15,6 +15,8 @@ dbConnection.once("open", () => {
     console.log("Connected to MongoDB");
 });
 
+// cron job for deleting messages older than a month;
+ require("./utils/bgJobForMessages")
 
 // express setup
 

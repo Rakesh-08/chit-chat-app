@@ -17,9 +17,12 @@ let createMessage = async (req, res) => {
         })
 
         let queryArray = [senderId, ...receiver];
+
+   
         let chatRoom = await chatModel.findOne({
-            members:queryArray
+            members: { $all: queryArray }
         })
+       
 
         if (!chatRoom) {
             let createChatRoom = await chatModel.create({

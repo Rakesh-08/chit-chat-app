@@ -5,46 +5,84 @@ import SendIcon from "@mui/icons-material/Send";
 import KeyboardBackspaceIcon from "@mui/icons-material/KeyboardBackspace";
 import { useSelector,useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
-// import { io } from "socket.io-client";
+import { io } from "socket.io-client";
+ import { format } from "timeago.js";
 import { sendMessage,fetchMessagesForChatRoom } from '../apiCalls/chatApi';
 
 const ChatRoom = () => {
-  let [latestMsgRef, setLatestMsgRef] = useState(null);
-  // let socket = useRef();
+  let scroll = useRef(null);
+  let socket = useRef();
+  let [sendText, setSendText] = useState(null);
+  let [receiveMessage, setReceiveMessage] = useState(null);
+  let [disconnectTime, setDisconnectTime] = useState("");
   let [text, setText] = useState("");
   let [chatMsgs, setChatMsgs] = useState([]);
-  let [onlineUsers,setOnlineUsers]=useState([]);
+  let [onlineUsers, setOnlineUsers] = useState([]);
   let state = useSelector(state => state.ThemeReducer);
   let connect = useSelector((state) => state.ChatRoomReducer.connect);
   let NavigateTo = useNavigate();
 
-
-let loggedUser= JSON.parse(localStorage.getItem("LoggedUser"));
-
+  let loggedUser = JSON.parse(localStorage.getItem("LoggedUser"));
+ 
+  // establish connection with socket server
   useEffect(() => {
-
     if (localStorage.getItem("chatToken")) {
-           socketCalls   
+      socketCalls();
     }
-  }, [connect.id])
-  
+  }, [connect.id]);
+
+
+  // fetch latest online users
   useEffect(() => {
-    scrollToLatestMsg();
+    socket.current.on("get-users", (users) => {
+      setOnlineUsers(users);
+    });
+    socket.current.on("disconnet-time", (data) => {
+      setDisconnectTime(data.disconnectedAt)
+    })
+  }, [onlineUsers])
+  
+  // send message to socket server
+  useEffect(() => {
+    if (sendText !== null) {
+      socket.current.emit("send-message", sendText);
+      console.log(sendText)
+    }
+  }, [sendText])
+ 
+  // receive message from socket server
+  useEffect(() => {
+
+    socket.current.on("receive-message", (data) => {
+      setReceiveMessage(data)
+    });
+    console.log("first")
+    
+    if (receiveMessage !== null) {
+      console.log("second")
+      setChatMsgs([...chatMsgs, receiveMessage])
+    }
+  }, [receiveMessage])
+  
+  // fetch messages for a chat room
+  useEffect(() => {
     if (localStorage.getItem("chatToken")) {
-         fetchMessages(connect.chatRoomId)
+      fetchMessages(connect.chatRoomId)
     } else {
       setChatMsgs(msgs)
     }
-  }, [connect.id,latestMsgRef])
+  }, [connect.id,connect._id])
   
+// scroll to latest message
+  useEffect(() => {
+    scrollToLatestMsg();
+
+  }, [chatMsgs]);
+
   let socketCalls = () => {
 
-    // socket.current = io("http://localhost:5050");
-    // socket.current.emit("new-user", connect._id);
-    // socket.current.on("get-users", (users) => {
-    //   setOnlineUsers(users);
-    //   console.log(users);
-    // });
+    socket.current = io("http://localhost:5050");
+    socket.current.emit("new-user", loggedUser?._id);  
   };
 
  let fetchMessages = (id) => {
@@ -59,29 +97,31 @@ let loggedUser= JSON.parse(localStorage.getItem("LoggedUser"));
   
   let scrollToLatestMsg = () => {
 
-     if (latestMsgRef) {
-       latestMsgRef.scrollIntoView({ behavior: "smooth" });
-     }
-  }
+    if (scroll.current) {
+      scroll.current.scrollIntoView({ behavior: "smooth" });
+    }
+  };
 
   let handleOnEnter = () => {
     if (text == "") {
-      return 
+      return
     }
 
     let temp = {
       senderId: JSON.parse(localStorage.getItem("LoggedUser"))?._id,
-      receiver:[connect.id],
-      msg:text
+      receiver: [connect.id || connect._id],
+      msg: text
     }
   
     sendMessage(temp).then(res => {
-          fetchMessages(connect.chatRoomId)
-    }).catch(err=>console.log(err));
+      // fetchMessages(connect.chatRoomId)
+      temp.createdAt = Date.now();
+      setChatMsgs([...chatMsgs, temp]);
+      setSendText(temp);
+    }).catch(err => console.log(err));
     
-    scrollToLatestMsg();
-  }
-
+    
+  };
 
 
   return (
@@ -95,7 +135,7 @@ let loggedUser= JSON.parse(localStorage.getItem("LoggedUser"));
     >
       {/* header part */}
       <div
-        style={{ background: "lightGreen", position: "sticky", top: 0 }}
+        style={{ backgroundColor: "lightGreen", position: "sticky", top: 0 }}
         className="p-2 shadow-lg"
       >
         <div className="d-flex align-items-center ">
@@ -105,10 +145,17 @@ let loggedUser= JSON.parse(localStorage.getItem("LoggedUser"));
           />
           <Avatar img={connect.userImg} dim={40} />
           <div className="mx-2">
-            <div className="">
-              <span> {connect.savedAs || connect.mobile||connect.unknown}</span>
+            <div>
+              <span>
+                {" "}
+                {connect.savedAs || connect.mobile || connect.unknown}
+              </span>
               <h6 style={{ fontSize: "13px", fontWeight: "bold" }}>
-                online || offline active 4h ago
+                {onlineUsers.find(
+                  (user) => user.userId == (connect.id || connect._id)
+                )
+                  ? "online"
+                  : `last seen ${format(disconnectTime)}`}
               </h6>
             </div>
           </div>
@@ -131,9 +178,11 @@ let loggedUser= JSON.parse(localStorage.getItem("LoggedUser"));
               <div
                 style={{
                   display: "flex",
-                  justifyContent: chat.id == loggedUser?._id ? "end" : "start",
+                  justifyContent:
+                    chat.senderId == loggedUser?._id ? "end" : "start",
                 }}
                 className="m-3"
+                ref={scroll}
                 key={i}
               >
                 <div style={{ maxWidth: "70%" }}>
@@ -143,13 +192,18 @@ let loggedUser= JSON.parse(localStorage.getItem("LoggedUser"));
                   <div
                     style={{
                       background:
-                        chat.id == loggedUser?._id ? "rgb(128, 128, 216)" : "violet",
-                      borderRadius: "0em 1em 1em",
+                        chat.senderId == loggedUser?._id
+                          ? "rgb(128, 128, 216)"
+                          : "violet",
+                      borderRadius:
+                        chat.senderId == loggedUser?._id
+                          ? "1em 1em 0em"
+                          : "0em 1em 1em",
                       position: "relative",
                     }}
                     className="p-2 "
                   >
-                    <span cl>{chat.msg}</span>
+                    <span>{chat.msg}</span>
 
                     <div
                       style={{
@@ -164,14 +218,16 @@ let loggedUser= JSON.parse(localStorage.getItem("LoggedUser"));
                           ? `${
                               new Date(chat.createdAt).getHours() - 12
                             }:${new Date(chat.createdAt).getMinutes()} pm`
-                          : `${new Date(chat.createdAt).getHours()}:${new Date(chat.createdAt).getMinutes()} am`}
+                          : `${new Date(chat.createdAt).getHours()}:${new Date(
+                              chat.createdAt
+                            ).getMinutes()} am`}
                       </span>
                     </div>
                   </div>
                 </div>
               </div>
             ))}
-            <span ref={ref=>setLatestMsgRef(ref)}></span>
+           
           </>
         ) : (
           <div className="h-100 d-flex align-items-center justify-content-center p-2">
@@ -183,7 +239,10 @@ let loggedUser= JSON.parse(localStorage.getItem("LoggedUser"));
       </div>
 
       {/* type input msg */}
-      <div className="d-flex  align-items-center bg-white p-2  w-100 position-sticky bottom-0">
+      <div
+        style={{ background: state.backgroundColor }}
+        className="d-flex  align-items-center p-2  w-100 position-sticky bottom-0"
+      >
         <button className="btn bg-white shadow-lg">+</button>
         <InputEmoji
           value={text}
@@ -198,12 +257,13 @@ let loggedUser= JSON.parse(localStorage.getItem("LoggedUser"));
           data-toggle
           title="send"
           className="btn btn-warning text-white h-50 "
-        >
-          <SendIcon
-            onClick={() => {
+          onClick={() => {
               handleOnEnter();
               setText("");
             }}
+        >
+          <SendIcon
+           
           />
         </button>
       </div>

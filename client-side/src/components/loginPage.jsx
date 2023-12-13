@@ -2,7 +2,7 @@ import React,{useState,useEffect} from "react";
 import { Modal } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import { loginCall, registerToPlatform } from "../apiCalls/authApi";
-import bcrypt from "bcryptjs";
+ import bcrypt from "bcryptjs";
 
 
 let emptyOTP = {

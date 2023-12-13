@@ -7,7 +7,7 @@ let io = require("socket.io")( 5050,{
 let activeUsers=[]
 
 io.on("connection", (socket) => {
-        
+    console.log(activeUsers)
        // add new user
     socket.on("new-user", (userId) => {
              
@@ -22,12 +22,22 @@ io.on("connection", (socket) => {
      console.log("connected Users",activeUsers)
     })
 
-   
+    // send message to receiver
+    socket.on("send-message", (data) => {
+       
+        let [receiverId] = data.receiver;
+        let user = activeUsers.find(user => user.userId == receiverId);
+        console.log(activeUsers)
+        if (user) {
+            console.log(data,user)
+            io.to(user.socketId).emit("receive-message", data);
+        }
+    })
 
     socket.on("disconnect", () => {
         activeUsers = activeUsers.filter(user => user.socketId !== socket.id);
-        console.log("User disconnected ", activeUsers);
-        io.emit("get-users", activeUsers)
+        io.emit("get-users", activeUsers);
+        io.emit("disconnet-time", { disconnectedAt: Date.now() });
     })
 
 })

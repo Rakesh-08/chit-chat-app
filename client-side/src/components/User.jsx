@@ -10,7 +10,7 @@ import { getUser } from "../apiCalls/userApi";
 const User = ({ chatRoomId,user,senderId }) => {
   let dispatch = useDispatch();
   let NavigateTo = useNavigate();
-  let [unknown,setUnknown]=useState("Unknown")
+  let [unknown,setUnknown]=useState({})
   let [messages,setMessaages] = useState([])
  
   
@@ -19,7 +19,7 @@ const User = ({ chatRoomId,user,senderId }) => {
       
     if (!user) {
          getUser(senderId).then(res => {
-            setUnknown(res.data.mobile) 
+            setUnknown(res.data) 
            
          })
            .catch(err =>
@@ -45,7 +45,7 @@ const User = ({ chatRoomId,user,senderId }) => {
       onClick={() => {
         dispatch({
           type: "changeChatRoom",
-          payload:{...user,chatRoomId:chatRoomId,unknown:unknown},
+          payload:{...user,chatRoomId:chatRoomId,...unknown},
         });
 
         if (window.innerWidth <= 600) {
@@ -58,7 +58,7 @@ const User = ({ chatRoomId,user,senderId }) => {
 
       <div className="w-100 mx-2">
         <div className="d-flex justify-content-between">
-          <span className="fw-bold">{user?.savedAs || user?.mobile||unknown}</span>
+          <span className="fw-bold">{user?.savedAs || user?.mobile||unknown.mobile}</span>
           <span style={{ fontSize: "12px", color: "darkOrange" }}>{format(messages[messages.length-1]?.createdAt)}</span>
         </div>
         <div style={{ fontSize: "14px", color: "rgb(94,94,88)" }}>
