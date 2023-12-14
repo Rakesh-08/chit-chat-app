@@ -7,7 +7,7 @@ expressApp.use(cors());
 
 let io = require("socket.io")(5050, {
     cors: {
-        orging:"*"
+        origin:"*"
     }
 })
 
