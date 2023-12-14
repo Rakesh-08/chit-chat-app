@@ -1,7 +1,7 @@
 import axios from "axios"
-"https://chit-chat-app-tqgu.onrender.com"
+
 let axiosInstance = axios.create({
-    baseURL:"http://localhost:8099"
+    baseURL: "https://chit-chat-app-tqgu.onrender.com"
 });
 
 

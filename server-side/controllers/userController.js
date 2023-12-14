@@ -111,12 +111,17 @@ let uploadProfileImage = async (req, res) => {
         if (user.profilePic) {
             let temp = user.profilePic.split(process.env.BASE_URL)[1];
 
-            fs.unlink(`public${temp}`, (err) => {
+            if (fs.existsSync(`public${temp}`)) {
+                
+                 fs.unlink(`public${temp}`, (err) => {
                 if (err) {
                     console.log(err);
                     return res.status(500).json(err)
                 }
             })
+            }
+
+           
         }
 
         // update profile image stored in users who saved my contact; 
@@ -124,7 +129,6 @@ let uploadProfileImage = async (req, res) => {
             "savedContacts.id": req._id
         });
 
-        console.log("before",updateImageToOthersContact);
 
         updateImageToOthersContact.map(async(user) => {
           let cont=user.savedContacts.find(contact => contact.id==req._id);
@@ -132,7 +136,7 @@ let uploadProfileImage = async (req, res) => {
             await user.save()
         })
 
-        console.log(updateImageToOthersContact)
+        console.log(updateImageToOthersContact[0].savedContacts)
        
         user.profilePic = url;
         await user.save();
