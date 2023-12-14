@@ -57,7 +57,7 @@ const HomeLeftPart = () => {
         width: "36vw",
         background: state.backgroundColor,
         color: state.color,
-        height: "102vh",
+        height: "100vh",
       }}
       className="me-1 py-2  shadow rounded-2"
     >

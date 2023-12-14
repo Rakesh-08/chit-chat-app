@@ -130,7 +130,7 @@ const ChatRoom = () => {
     >
       {/* header part */}
       <div
-        style={{ backgroundColor: "lightGreen", position: "sticky", top: 0 }}
+        style={{ backgroundColor: "lightGreen", position: "sticky", top: 0,zIndex:8888 }}
         className="p-2 shadow-lg"
       >
         <div className="d-flex align-items-center ">
