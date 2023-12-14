@@ -56,6 +56,7 @@ const HomeLeftPart = () => {
         width: "36vw",
         background: state.backgroundColor,
         color: state.color,
+        height:"102vh"
       }}
       className="me-1 py-2  shadow rounded-2"
     >
@@ -87,7 +88,7 @@ const HomeLeftPart = () => {
               border: "1px solid  gray",
               zIndex: 1000,
             }}
-            className="bg-white text-dark p-1 px-2"
+            className="bg-white text-dark p-1 px-3"
           >
             <p
               onClick={() => {

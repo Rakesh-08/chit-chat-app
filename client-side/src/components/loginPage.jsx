@@ -17,6 +17,7 @@ const LoginPage = () => {
     let [showVerify, setShowVerify] = useState(false);
     let [credentials, setCredentials] = useState({ email: "", mobile: "" })
   let [msg, setMsg] = useState("");
+  let [loading, setLoading] = useState(false);
   let NavigateTo = useNavigate();
 
   useEffect(() => {
@@ -31,11 +32,12 @@ const LoginPage = () => {
       if (credentials.mobile.length!=10) {
         return setMsg("Invalid Mobile Number")
       }
-
+      setLoading(true);
       registerToPlatform({ email: credentials.email })
         .then(res => {
           localStorage.setItem("otp", res.data.otp);
-          localStorage.setItem("time",JSON.stringify(res.data.time))
+          localStorage.setItem("time", JSON.stringify(res.data.time))
+          setLoading(false);
         setShowVerify(true);
      }).catch(err=>console.log(err))
        
@@ -95,7 +97,7 @@ const LoginPage = () => {
             </div>
             <p className="text-danger text-center">{msg}</p>
 
-            <button className="btn btn-warning mx-4 w-75">submit</button>
+            <button className="btn btn-warning mx-4 w-75">{loading?"....Sending OTP":"submit"}</button>
           </form>
         </div>
       </div>
@@ -114,6 +116,7 @@ const LoginPage = () => {
 let VerificationModal = ({showVerify,setShowVerify,email,mobile}) => {
   let [otp, setOtp] = useState(emptyOTP);
   let [errMsg, setErrMsg] = useState("");
+  let [verifying, setVerifying] = useState(false)
 
   let NavigateTo = useNavigate()
   
@@ -128,7 +131,7 @@ let VerificationModal = ({showVerify,setShowVerify,email,mobile}) => {
       res += otp[i];
     }
 
-  
+  setVerifying(true)
     let thresholdTime = Date.now(JSON.parse(localStorage.getItem("time")));
     let currTime = Date.now();
 
@@ -142,10 +145,12 @@ let VerificationModal = ({showVerify,setShowVerify,email,mobile}) => {
       
         localStorage.removeItem("userStatus")
         localStorage.setItem("LoggedUser", JSON.stringify(res.data))
-        localStorage.setItem("chatToken",res.data.accessToken)
+        localStorage.setItem("chatToken", res.data.accessToken);
+        setVerifying(false)
          NavigateTo("/Home")
       }).catch((err) => {
         console.log(err);
+        setVerifying(false)
       
       })
       localStorage.removeItem("otp");
@@ -222,7 +227,10 @@ let VerificationModal = ({showVerify,setShowVerify,email,mobile}) => {
           <p className="m-2 fw-bold">*OTP valid for 5 minutes</p>
           <div className="d-flex justify-content-center mt-3">
             <button onClick={verifyOTP} className="btn btn-success w-50">
-              Verify
+              {verifying ?
+              <div class="spinner-border text-primary" role="status">
+  <span className="sr-only"></span>
+</div>:"Verify"}
             </button>
           </div>
         </Modal.Body>

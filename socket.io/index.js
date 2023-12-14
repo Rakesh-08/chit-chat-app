@@ -1,4 +1,11 @@
-let io = require("socket.io")( 5050,{
+let expressApp = require("express")();
+
+let cors = require("cors");
+
+expressApp.use(cors());
+
+
+let io = require("socket.io")(5050, {
     cors: {
         origin:"chit-chat-with-mandal.netlify.app"
     }   
