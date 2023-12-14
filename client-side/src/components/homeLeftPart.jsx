@@ -19,6 +19,7 @@ const HomeLeftPart = () => {
   let [chatRooms, setChatRooms] = useState([]);
   let [contacts, setContacts] = useState([]);
   let [messages, setMessaages] = useState([]);
+  let [searchTerm, setSearchTerm] = useState("");
   let state = useSelector(state => state.ThemeReducer);
   let NavigateTo = useNavigate();
   let dispatch = useDispatch();
@@ -56,7 +57,7 @@ const HomeLeftPart = () => {
         width: "36vw",
         background: state.backgroundColor,
         color: state.color,
-        height:"102vh"
+        height: "102vh",
       }}
       className="me-1 py-2  shadow rounded-2"
     >
@@ -168,7 +169,7 @@ const HomeLeftPart = () => {
                   let [senderId] = chatRoom.members.filter(
                     (id) => id !== loggedUser?._id
                   );
-              let sender = contacts.find((con) => con.id == senderId);
+                  let sender = contacts.find((con) => con.id == senderId);
                   return (
                     <User
                       key={i}
@@ -192,9 +193,10 @@ const HomeLeftPart = () => {
 
         {routes == "contacts" && (
           <>
-            <SearchBar />
-            {contacts.length > 0 ? (
+            <SearchBar searchTerm={searchTerm} setSearchTerm={setSearchTerm} />
+            {contacts.length >0 ? (
               <SavedContacts
+                searchTerm={searchTerm}
                 contacts={contacts}
                 chatRooms={chatRooms}
               />

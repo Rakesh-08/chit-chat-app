@@ -228,7 +228,7 @@ let VerificationModal = ({showVerify,setShowVerify,email,mobile}) => {
           <div className="d-flex justify-content-center mt-3">
             <button onClick={verifyOTP} className="btn btn-success w-50">
               {verifying ?
-              <div class="spinner-border text-primary" role="status">
+              <div className="spinner-border text-primary" role="status">
   <span className="sr-only"></span>
 </div>:"Verify"}
             </button>

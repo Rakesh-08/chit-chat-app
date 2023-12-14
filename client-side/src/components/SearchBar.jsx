@@ -4,13 +4,11 @@ import { Search } from "@mui/icons-material";
 import SearchIcon from "@mui/icons-material/Search";
 
 
-const SearchBar = () => {
-  let [search, setSearch] = useState("");
- 
+const SearchBar = ({searchTerm,setSearchTerm}) => {
 
   let handleSearch = (e) => {
     e.preventDefault();
-    console.log("hellow")
+    console.log(searchTerm)
   };
 
   return (
@@ -31,8 +29,8 @@ const SearchBar = () => {
         className="search-input"
         placeholder="search your contacts..."
         style={{ outline: "none", border: 0 }}
-        value={search}
-        onChange={(e) => setSearch(e.target.value)}
+        value={searchTerm}
+        onChange={(e) => setSearchTerm(e.target.value)}
       />
       <IconButton
         type="submit"

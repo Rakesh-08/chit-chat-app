@@ -4,23 +4,30 @@ import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 
 
-const SavedContacts = ({contacts,chatRooms}) => {
+const SavedContacts = ({contacts,chatRooms,searchTerm}) => {
 
   let loggedUser = JSON.parse(localStorage.getItem("LoggedUser"))
 
   return (
     <div className="my-3">
-      {contacts.map((contact, i) => {
-        
-        let chatR = chatRooms.find(cr => {
-          if (cr.members.includes(contact.id) && cr.members.includes(loggedUser._id)) {
-             return true
-           }
-        })
+      {contacts
+        .filter((con) =>
+          con.savedAs.toUpperCase().includes(searchTerm.toUpperCase())
+        )
+        .map((contact, i) => {
+          let chatR = chatRooms.find((cr) => {
+            if (
+              cr.members.includes(contact.id) &&
+              cr.members.includes(loggedUser._id)
+            ) {
+              return true;
+            }
+          });
 
-        return <SingleChat key={i} contact={contact} chatRoomId={chatR._id} />
-      }
-      )}
+          return (
+            <SingleChat key={i} contact={contact} chatRoomId={chatR._id} />
+          );
+        })}
     </div>
   );
 }
