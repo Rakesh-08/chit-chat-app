@@ -5,7 +5,11 @@ let cors = require("cors");
 expressApp.use(cors());
 
 
-let io = require("socket.io")(5050)
+let io = require("socket.io")(5050, {
+    cors: {
+        orging:"*"
+    }
+})
 
 let activeUsers=[]
 
