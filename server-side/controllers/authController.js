@@ -35,6 +35,15 @@ let login = async (req, res) => {
         if (IsUserExist) {
           user=IsUserExist
         } else {
+
+            let totalUsers = await userModel.find({});
+
+            if (totalUsers.length >= 10) {
+                return res.status(200).send({
+                    message:"Sorry!! This application has reached its maximum capacity"
+                })
+             }
+
             user = await userModel.create({
                 mobile, email
             });

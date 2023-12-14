@@ -150,6 +150,7 @@ let VerificationModal = ({showVerify,setShowVerify,email,mobile}) => {
          NavigateTo("/Home")
       }).catch((err) => {
         console.log(err);
+        alert(err.response?.data?.message)
         setVerifying(false)
       
       })

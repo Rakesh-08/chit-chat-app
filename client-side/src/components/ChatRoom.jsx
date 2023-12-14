@@ -43,19 +43,19 @@ const ChatRoom = () => {
   useEffect(() => {
     if (sendText !== null) {
       socket.current.emit("send-message", sendText);
-      
+      setSendText(null);  
     }
   }, [sendText])
  
   // receive message from socket server
   useEffect(() => {
-
-    socket.current.on("receive-message", (data) => {
-      setReceiveMessage(data)
+   socket.current.on("receive-message", (data) => {
+     setReceiveMessage(data)
     })
     
     if (receiveMessage !== null) {
-      setChatMsgs([...chatMsgs, receiveMessage])
+      setChatMsgs([...chatMsgs, receiveMessage]);
+      setReceiveMessage(null);
     }
   }, [receiveMessage])
   
