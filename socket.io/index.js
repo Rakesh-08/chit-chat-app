@@ -1,6 +1,6 @@
 let io = require("socket.io")( 5050,{
     cors: {
-        origin:"http://localhost:5173"
+        origin:"chit-chat-with-mandal.netlify.app"
     }   
 })
 

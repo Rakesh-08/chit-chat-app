@@ -5,7 +5,6 @@ import { useNavigate } from "react-router-dom";
 
 
 const SavedContacts = ({contacts,chatRooms}) => {
-  let NavigateTo = useNavigate();
 
   let loggedUser = JSON.parse(localStorage.getItem("LoggedUser"))
 
@@ -29,12 +28,8 @@ const SavedContacts = ({contacts,chatRooms}) => {
 let SingleChat = ({contact,chatRoomId}) => {
   
   let dispatch = useDispatch();
+   let NavigateTo = useNavigate();
   
-  useEffect(() => {
-    
-  }, [])
-  
- 
   return (
     <div
       style={{ cursor: "pointer" }}

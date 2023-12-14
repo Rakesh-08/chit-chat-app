@@ -76,7 +76,7 @@ const ChatRoom = () => {
 
   let socketCalls = () => {
 
-    socket.current = io("http://localhost:5050");
+    socket.current = io("https://socket-connection-07ep.onrender.com");
     socket.current.emit("new-user", loggedUser?._id);  
   };
 
