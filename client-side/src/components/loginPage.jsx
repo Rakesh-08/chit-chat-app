@@ -136,7 +136,10 @@ let VerificationModal = ({showVerify,setShowVerify,email,mobile}) => {
     let currTime = Date.now();
 
     if ((currTime - thresholdTime) / (1000 * 60) > 5) {
-      return alert("SORRY! OTP IS EXPIRED ,TRY AGAIN")
+      setVerifying(false);
+
+      return alert("SORRY! OTP IS EXPIRED ,TRY AGAIN");
+     
     }
     
     if (bcrypt.compareSync(res,localStorage.getItem("otp"))) {
@@ -146,7 +149,7 @@ let VerificationModal = ({showVerify,setShowVerify,email,mobile}) => {
         localStorage.removeItem("userStatus")
         localStorage.setItem("LoggedUser", JSON.stringify(res.data))
         localStorage.setItem("chatToken", res.data.accessToken);
-        setVerifying(false)
+        
          NavigateTo("/Home")
       }).catch((err) => {
         console.log(err);
@@ -158,7 +161,8 @@ let VerificationModal = ({showVerify,setShowVerify,email,mobile}) => {
       localStorage.removeItem("time");
       
     } else {
-        setErrMsg("OTP is not correct ,please try again")
+      setErrMsg("OTP is not correct ,please try again");
+      setVerifying(false);
      }
     
   }
@@ -173,7 +177,10 @@ let VerificationModal = ({showVerify,setShowVerify,email,mobile}) => {
     return (
       <Modal
         show={showVerify}
-        onHide={() => setShowVerify(false)}
+        onHide={() => {
+          setShowVerify(false);
+          setErrMsg("");
+        }}
         centered
         backdrop="static"
       >
